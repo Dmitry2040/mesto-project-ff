@@ -12,7 +12,7 @@ function createCard({name, link}, deleteCallBack) {
 };
 
 function removeElement(evt) {
-    evt.target.parentElement.remove();
+    evt.target.closest('.card').remove();
 };
     
 for (let i=0; i< initialCards.length; i++) {
