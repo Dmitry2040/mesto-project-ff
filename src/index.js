@@ -1,8 +1,8 @@
 
 import { initialCards } from './components/cards.js';
 import './styles/index.css';
-import { createCard, removeElement, likeCard} from './components/cards.js';
-import { openModal,closeModal } from './components/modal.js';
+import { createCard, removeElement, likeCard} from './components/card.js';
+import { openModal, closeModal, closeModalByOverlay} from './components/modal.js';
 
 const places = document.querySelector('.places__list');
 const popups = document.querySelectorAll('.popup');
@@ -27,28 +27,25 @@ for (let i=0; i< initialCards.length; i++) {
 
 function openImage({name, link}) {
     popupImage.querySelector('.popup__image').src = link;
+    popupImage.querySelector('.popup__image').alt= name;
     popupImage.querySelector('.popup__caption').textContent = name;
     openModal(popupImage);
 };
-  
-popups.forEach(function(element){
-    element.addEventListener('click', (evt) => {
-    if (evt.currentTarget === evt.target) {
-        element.classList.remove('popup_is-opened');
-    }}); 
-    document.addEventListener('keydown', (evt) => {
-        if (evt.key == 'Escape') {
-            element.classList.remove('popup_is-opened'); 
-    }});
+ 
+popups.forEach(function(element) { 
+    element.addEventListener('click', closeModalByOverlay);
     element.classList.add('popup_is-animated');
 });
 
-popupCloseBtn.forEach((el) => {
-    el.addEventListener('click', () => { 
-    closeModal(popups);})
+popupCloseBtn.forEach((el) => { 
+    el.addEventListener('click', () => {  
+    closeModal(el.closest('.popup'));
+    });
 });
 
 editBtn.addEventListener('click', () => {
+    popupEdit.querySelector('.popup__input_type_name').value = document.querySelector('.profile__title').textContent;
+    popupEdit.querySelector('.popup__input_type_description').value = document.querySelector('.profile__description').textContent;
     openModal(popupEdit);
 });
 
@@ -70,6 +67,6 @@ function editFormSubmit(evt) {
     evt.preventDefault(); 
     document.querySelector('.profile__title').textContent = nameInput.value;
     document.querySelector('.profile__description').textContent = jobInput.value;
-    popupEdit.classList.remove('popup_is-opened')
+    popupEdit.classList.remove('popup_is-opened');
 };
 
