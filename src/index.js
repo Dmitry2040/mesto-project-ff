@@ -33,7 +33,6 @@ function openImage({name, link}) {
 };
  
 popups.forEach(function(element) { 
-    element.addEventListener('click', closeModalByOverlay);
     element.classList.add('popup_is-animated');
 });
 
