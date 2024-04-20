@@ -3,6 +3,7 @@ import { initialCards } from './components/cards.js';
 import './styles/index.css';
 import { createCard, removeElement, likeCard} from './components/card.js';
 import { openModal, closeModal, closeModalByOverlay} from './components/modal.js';
+import { addNewCard, deleteCardApi, getInitialCards, getProfileData, patchProfile } from './components/api.js'
 
 const places = document.querySelector('.places__list');
 const popups = document.querySelectorAll('.popup');
@@ -33,11 +34,11 @@ const validationConfig = {
 
 
 
-for (let i=0; i< initialCards.length; i++) {
-    places.append(createCard(initialCards[i], removeElement, likeCard, openImage));
-};
+// for (let i=0; i< initialCards.length; i++) {
+//     places.append(createCard(initialCards[i], removeElement, likeCard, openImage));
+// };
 
-function openImage({name, link}) {
+function openImage(name, link) {
     popupImage.querySelector('.popup__image').src = link;
     popupImage.querySelector('.popup__image').alt= name;
     popupImage.querySelector('.popup__caption').textContent = name;
@@ -70,11 +71,10 @@ formElementAdd.addEventListener('submit', (evt) => addFormSubmit(evt, validation
 
 function addFormSubmit(evt, validationConfig) {
     evt.preventDefault(); 
-    places.prepend(createCard({name: cardNameInput.value, link: cardUrlInput.value}, removeElement, likeCard, openImage));
-    clearValidation(formElementAdd, validationConfig);
+    places.prepend(createCard({name: cardNameInput.value, link: cardUrlInput.value}, deleteCardApi, likeCard, openImage));
+    addNewCard(cardNameInput.value,cardUrlInput.value)
     formElementAdd.reset();
-   
-    // popupAdd.querySelector('.popup__button').classList.add('popup__button_disabled');
+    clearValidation(formElementAdd, validationConfig);
     popupAdd.classList.remove('popup_is-opened');
 };
 
@@ -82,6 +82,7 @@ function editFormSubmit(evt) {
     evt.preventDefault(); 
     document.querySelector('.profile__title').textContent = nameInput.value;
     document.querySelector('.profile__description').textContent = jobInput.value;
+    patchProfile(nameInput.value,jobInput.value);
     popupEdit.classList.remove('popup_is-opened');
 };
 
@@ -162,5 +163,42 @@ function clearValidation(formElement, config) {
     
 }
 
+
 enableValidation(validationConfig); 
 
+Promise.all([getInitialCards(), getProfileData()])
+    .then(([resCards, resProfile]) => {
+            for (let i=0; i< resCards.length; i++) { 
+            places.append(createCard(resCards[i], deleteCardApi, likeCard, openImage));
+            document.querySelectorAll('.card__like-button-counter')[i].textContent = resCards[i].likes.length;
+            if (resCards[i].owner._id !== resProfile._id) {
+            document.querySelectorAll('.card__delete-button')[i].setAttribute('style', 'display:none'); 
+            };
+        };
+        document.querySelector('.profile__title').textContent = resProfile.name;
+        document.querySelector('.profile__description').textContent = resProfile.about;
+        document.querySelector('.profile__image').setAttribute('style', `background-image: url(${resProfile.avatar})`);
+        })
+    .catch((err) => {
+        console.log(err);
+    })
+
+    
+
+// getInitialCards()
+//   .then((result) => {
+//     for (let i=0; i< result.length; i++) {
+//         places.append(createCard(result[i], removeElement, likeCard, openImage));
+//     };
+//   })
+//    .catch((err) => {
+//     console.log(err); // выводим ошибку в консоль
+//   }); 
+
+
+// getProfileData()
+//   .then((result) => {
+//     document.querySelector('.profile__title').textContent = result.name;
+//     document.querySelector('.profile__description').textContent = result.about;
+//     document.querySelector('.profile__image').setAttribute('style', `background-image: url(${result.avatar})`)
+//   })

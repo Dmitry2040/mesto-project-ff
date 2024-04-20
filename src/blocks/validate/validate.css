@@ -9,6 +9,15 @@
 .form__input-error {
     display: none;
     color: red;
+    margin-block-start: -6px;
+    font-size: 12px;
+    line-height: 14px;
+    position: absolute;
+
+}
+
+.form__input-error:last-of-type {
+    margin-block-start: 10px;
 }
 
 .popup__error_visible {
