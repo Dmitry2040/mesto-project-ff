@@ -7,7 +7,31 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  position: relative;
 }
+
+.profile__image:hover .avatar_overlay {
+  display: block;
+  opacity: 1;
+  @starting-style {
+    opacity: 0;
+  }
+ 
+}
+   
+
+.avatar_overlay {
+  background: url(/src/images/editAvatar.svg) no-repeat center;
+  position: absolute;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: none;
+  transition: 0.3s ease;
+  opacity: 0;
+  transition-behavior: allow-discrete;
+}
+
 
 @media screen and (max-width: 740px) {
   .profile__image {

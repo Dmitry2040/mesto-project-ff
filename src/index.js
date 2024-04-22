@@ -1,9 +1,8 @@
 
-import { initialCards } from './components/cards.js';
 import './styles/index.css';
-import { createCard, removeElement, likeCard} from './components/card.js';
-import { openModal, closeModal, closeModalByOverlay} from './components/modal.js';
-import { addNewCard, deleteCardApi, getInitialCards, getProfileData, patchProfile } from './components/api.js'
+import { createCard, toggleLikeState} from './components/card.js';
+import { openModal, closeModal} from './components/modal.js';
+import { addNewCard, patchProfile, deleteCardApi, getInitialCards, getProfileData, changeAvatar} from './components/api.js'
 
 const places = document.querySelector('.places__list');
 const popups = document.querySelectorAll('.popup');
@@ -32,11 +31,65 @@ const validationConfig = {
     errorInactive: '.form__input-error'
   }
 
+  let cardData = {};
+  let userId;
 
-
+  Promise.all([getInitialCards(), getProfileData()])
+  .then(([resCards, resProfile]) => {
+          cardData = resCards;
+          userId = resProfile._id;
+          for (let i=0; i< resCards.length; i++) { 
+          places.append(createCard(resCards[i], resProfile._id, deleteCardApi, toggleLikeState ,openImage));
+          document.querySelectorAll('.card__like-button-counter')[i].textContent = resCards[i].likes.length;
+          if (resCards[i].owner._id !== resProfile._id) {
+          document.querySelectorAll('.card__delete-button')[i].setAttribute('style', 'display:none'); 
+          };
+      };
+      document.querySelector('.profile__title').textContent = resProfile.name;
+      document.querySelector('.profile__description').textContent = resProfile.about;
+      document.querySelector('.profile__image').setAttribute('style', `background-image: url(${resProfile.avatar})`);
+      })
+    .catch((err) => {console.log(err)})
+   
 // for (let i=0; i< initialCards.length; i++) {
 //     places.append(createCard(initialCards[i], removeElement, likeCard, openImage));
 // };
+
+function loadingProcess(btn, isLoading) {
+    if (isLoading) {
+      btn.textContent = "Сохранение... 🖫";
+    } else {
+      btn.textContent = "Сохранить";
+    }
+  };
+
+const popupAvatar = document.querySelector('.popup_type_avatar');
+const profileImage = document.querySelector('.profile__image');
+const popupAvatarBtn = popupAvatar.querySelector('.popup__button');
+const popupFormAvatar = popupAvatar.querySelector('.popup__form_edit-avatar');
+const avatarUrlInput = popupAvatar.querySelector(".popup__input_type_url");
+
+function openAvatarModal() {
+    openModal(popupAvatar);
+}
+
+function avatarFormSubmit(evt) {
+    evt.preventDefault();
+    loadingProcess(popupAvatarBtn, true);
+    changeAvatar(avatarUrlInput.value)        
+    .then((res) => {
+        profileImage.style.backgroundImage = `url('${res.avatar}')`;
+        closeModal(popupAvatar);
+        popupFormAvatar.reset();
+    })
+    .catch((err) => {console.log(err)})
+    .finally(() => {    
+        loadingProcess(popupAvatarBtn,false)
+    })
+}
+
+profileImage.addEventListener('click', openAvatarModal);
+popupAvatarBtn.addEventListener('click', avatarFormSubmit);
 
 function openImage(name, link) {
     popupImage.querySelector('.popup__image').src = link;
@@ -71,12 +124,15 @@ formElementAdd.addEventListener('submit', (evt) => addFormSubmit(evt, validation
 
 function addFormSubmit(evt, validationConfig) {
     evt.preventDefault(); 
-    places.prepend(createCard({name: cardNameInput.value, link: cardUrlInput.value}, deleteCardApi, likeCard, openImage));
     addNewCard(cardNameInput.value,cardUrlInput.value)
+     .then((cardData) => {
+        places.prepend(createCard(cardData , userId, deleteCardApi, toggleLikeState, openImage));
+    })
     formElementAdd.reset();
     clearValidation(formElementAdd, validationConfig);
     popupAdd.classList.remove('popup_is-opened');
 };
+
 
 function editFormSubmit(evt) {
     evt.preventDefault(); 
@@ -163,25 +219,8 @@ function clearValidation(formElement, config) {
     
 }
 
-
 enableValidation(validationConfig); 
 
-Promise.all([getInitialCards(), getProfileData()])
-    .then(([resCards, resProfile]) => {
-            for (let i=0; i< resCards.length; i++) { 
-            places.append(createCard(resCards[i], deleteCardApi, likeCard, openImage));
-            document.querySelectorAll('.card__like-button-counter')[i].textContent = resCards[i].likes.length;
-            if (resCards[i].owner._id !== resProfile._id) {
-            document.querySelectorAll('.card__delete-button')[i].setAttribute('style', 'display:none'); 
-            };
-        };
-        document.querySelector('.profile__title').textContent = resProfile.name;
-        document.querySelector('.profile__description').textContent = resProfile.about;
-        document.querySelector('.profile__image').setAttribute('style', `background-image: url(${resProfile.avatar})`);
-        })
-    .catch((err) => {
-        console.log(err);
-    })
 
     
 
