@@ -1,8 +1,8 @@
-
 import './styles/index.css';
 import { createCard, toggleLikeState} from './components/card.js';
 import { openModal, closeModal} from './components/modal.js';
 import { addNewCard, patchProfile, deleteCardApi, getInitialCards, getProfileData, changeAvatar} from './components/api.js'
+import {enableValidation, clearValidation} from './components/validation.js';
 
 const places = document.querySelector('.places__list');
 const popups = document.querySelectorAll('.popup');
@@ -20,6 +20,11 @@ const cardNameInput = document.querySelector('.popup__input_type_card-name');
 const cardUrlInput = document.querySelector('.popup__input_type_url');  
 nameInput.value = document.querySelector('.profile__title').textContent;
 jobInput.value = document.querySelector('.profile__description').textContent;
+const popupAvatar = document.querySelector('.popup_type_avatar');
+const profileImage = document.querySelector('.profile__image');
+const popupAvatarBtn = popupAvatar.querySelector('.popup__button');
+const popupFormAvatar = popupAvatar.querySelector('.popup__form_edit-avatar');
+const avatarUrlInput = popupAvatar.querySelector(".popup__input_type_url");
 
 const validationConfig = {
     formSelector: '.popup__form',
@@ -29,45 +34,35 @@ const validationConfig = {
     inputErrorClass: 'popup__input_type_error',
     errorClass: 'popup__error_visible',
     errorInactive: '.form__input-error'
-  }
+}
 
-  let cardData = {};
-  let userId;
+let cardData = {};
+let userId;
 
-  Promise.all([getInitialCards(), getProfileData()])
-  .then(([resCards, resProfile]) => {
-          cardData = resCards;
-          userId = resProfile._id;
-          for (let i=0; i< resCards.length; i++) { 
-          places.append(createCard(resCards[i], resProfile._id, deleteCardApi, toggleLikeState ,openImage));
-          document.querySelectorAll('.card__like-button-counter')[i].textContent = resCards[i].likes.length;
-          if (resCards[i].owner._id !== resProfile._id) {
-          document.querySelectorAll('.card__delete-button')[i].setAttribute('style', 'display:none'); 
-          };
-      };
-      document.querySelector('.profile__title').textContent = resProfile.name;
-      document.querySelector('.profile__description').textContent = resProfile.about;
-      document.querySelector('.profile__image').setAttribute('style', `background-image: url(${resProfile.avatar})`);
-      })
-    .catch((err) => {console.log(err)})
+Promise.all([getInitialCards(), getProfileData()])
+.then(([resCards, resProfile]) => {
+        cardData = resCards;
+        userId = resProfile._id;
+        for (let i=0; i< resCards.length; i++) { 
+        places.append(createCard(resCards[i], resProfile._id, deleteCardApi, toggleLikeState ,openImage));
+        document.querySelectorAll('.card__like-button-counter')[i].textContent = resCards[i].likes.length;
+        if (resCards[i].owner._id !== resProfile._id) {
+        document.querySelectorAll('.card__delete-button')[i].setAttribute('style', 'display:none'); 
+        };
+    };
+    document.querySelector('.profile__title').textContent = resProfile.name;
+    document.querySelector('.profile__description').textContent = resProfile.about;
+    document.querySelector('.profile__image').setAttribute('style', `background-image: url(${resProfile.avatar})`);
+    })
+.catch((err) => {console.log(err)})
    
-// for (let i=0; i< initialCards.length; i++) {
-//     places.append(createCard(initialCards[i], removeElement, likeCard, openImage));
-// };
-
 function loadingProcess(btn, isLoading) {
     if (isLoading) {
       btn.textContent = "Сохранение... 🖫";
     } else {
       btn.textContent = "Сохранить";
     }
-  };
-
-const popupAvatar = document.querySelector('.popup_type_avatar');
-const profileImage = document.querySelector('.profile__image');
-const popupAvatarBtn = popupAvatar.querySelector('.popup__button');
-const popupFormAvatar = popupAvatar.querySelector('.popup__form_edit-avatar');
-const avatarUrlInput = popupAvatar.querySelector(".popup__input_type_url");
+};
 
 function openAvatarModal() {
     openModal(popupAvatar);
@@ -126,13 +121,12 @@ function addFormSubmit(evt, validationConfig) {
     evt.preventDefault(); 
     addNewCard(cardNameInput.value,cardUrlInput.value)
      .then((cardData) => {
-        places.prepend(createCard(cardData , userId, deleteCardApi, toggleLikeState, openImage));
+        places.prepend(createCard(cardData, userId, deleteCardApi, toggleLikeState, openImage));
     })
     formElementAdd.reset();
     clearValidation(formElementAdd, validationConfig);
     popupAdd.classList.remove('popup_is-opened');
 };
-
 
 function editFormSubmit(evt) {
     evt.preventDefault(); 
@@ -142,102 +136,4 @@ function editFormSubmit(evt) {
     popupEdit.classList.remove('popup_is-opened');
 };
 
-
-
-
-function isValid(formElement, inputElement, config) {
-    if (inputElement.validity.patternMismatch) {
-        inputElement.setCustomValidity(inputElement.dataset.errorMessage);
-    } else {
-        inputElement.setCustomValidity("");
-    };
-   
-    if (!inputElement.validity.valid) {
-        showInputError(formElement, inputElement, inputElement.validationMessage, config);
-    } else {
-        hideInputError(formElement, inputElement, config);
-    }
-
-  }; 
-
-function showInputError(formElement, inputElement, errorMessage, config) {
-    const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.add(config.inputErrorClass);
-    errorElement.textContent = errorMessage;
-    errorElement.classList.add(config.errorClass);
-  };
-  
-function hideInputError(formElement, inputElement, config) {
-    const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.remove(config.inputErrorClass);
-    errorElement.classList.remove(config.errorClass);
-    errorElement.textContent = '';
-  };  
-
-function hasInvalidInput(inputList) {
-    return inputList.some((inputElement) => {
-        return !inputElement.validity.valid;
-    })
-}; 
-
-function toggleButtonState(inputList, buttonElement, config) {
-    if (hasInvalidInput(inputList)) {
-        buttonElement.disabled = true;
-        buttonElement.classList.add(config.inactiveButtonClass);
-    } else {
-        buttonElement.disabled = false;
-        buttonElement.classList.remove(config.inactiveButtonClass);
-    }
-}; 
-
-function setEventListeners(formElement, config) {
-    const inputList = Array.from(formElement.querySelectorAll(config.inputSelector));
-    const buttonElement = formElement.querySelector(config.submitButtonSelector);
-    toggleButtonState(inputList, buttonElement, config); 
-    inputList.forEach((inputElement) => {
-        inputElement.addEventListener('input', () => {
-            isValid(formElement, inputElement, config);
-            toggleButtonState(inputList, buttonElement, config);
-        });
-    });
-}; 
-
-function enableValidation(config) {
-    const formList = Array.from(document.querySelectorAll(config.formSelector));
-    formList.forEach((formElement) => {
-        setEventListeners(formElement, config);
-});
-};
-
-function clearValidation(formElement, config) {
-    formElement.querySelectorAll(config.errorInactive).forEach(el =>
-        el.textContent = '');
-    formElement.querySelectorAll(config.inputSelector).forEach(el =>
-        el.classList.remove(config.inputErrorClass));
-    formElement.querySelector(config.submitButtonSelector).disabled = true;
-    formElement.querySelector(config.submitButtonSelector).classList.add(config.inactiveButtonClass);
-    
-}
-
-enableValidation(validationConfig); 
-
-
-    
-
-// getInitialCards()
-//   .then((result) => {
-//     for (let i=0; i< result.length; i++) {
-//         places.append(createCard(result[i], removeElement, likeCard, openImage));
-//     };
-//   })
-//    .catch((err) => {
-//     console.log(err); // выводим ошибку в консоль
-//   }); 
-
-
-// getProfileData()
-//   .then((result) => {
-//     document.querySelector('.profile__title').textContent = result.name;
-//     document.querySelector('.profile__description').textContent = result.about;
-//     document.querySelector('.profile__image').setAttribute('style', `background-image: url(${result.avatar})`)
-//   })
+enableValidation(validationConfig);    

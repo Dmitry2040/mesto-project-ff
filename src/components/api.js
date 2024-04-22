@@ -1,4 +1,3 @@
-
 const config = {
     baseUrl: 'https://nomoreparties.co/v1/wff-cohort-11',
     headers: {
@@ -13,7 +12,6 @@ if (res.ok) {
 }
 return Promise.reject(`Ошибка: ${res.status}`);
 };
-
 
 export const getInitialCards = () => {
     return fetch(`${config.baseUrl}/cards`, {
@@ -65,7 +63,6 @@ export const addNewCard = (cardName, cardUrl) => {
         })
     }
 
-
 export const deleteCardApi = (cardId) => {
     return fetch(`${config.baseUrl}/cards/${cardId}`, {
         method: 'DELETE',
@@ -76,7 +73,6 @@ export const deleteCardApi = (cardId) => {
         console.log('Ошибка удаления карточки', err);
     })
 }
-
 
 export const putCardLike = (id) => {
     return fetch(`${config.baseUrl}/cards/likes/${id}`, {
@@ -98,7 +94,6 @@ export const deleteCardLike = (id) => {
     .catch((err) => {
         console.log('Ошибка удаления лайка', err);
     })
-  
 }
 
 export const changeAvatar = (avatar) => {

@@ -16,10 +16,8 @@
   @starting-style {
     opacity: 0;
   }
- 
 }
    
-
 .avatar_overlay {
   background: url(/src/images/editAvatar.svg) no-repeat center;
   position: absolute;
@@ -31,7 +29,6 @@
   opacity: 0;
   transition-behavior: allow-discrete;
 }
-
 
 @media screen and (max-width: 740px) {
   .profile__image {

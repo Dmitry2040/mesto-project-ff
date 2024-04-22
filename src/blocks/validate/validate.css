@@ -2,10 +2,6 @@
     border-bottom: 2px solid red;
 }
 
-/* .form__input_type_active {
-    display: block;
-} */
-
 .form__input-error {
     display: none;
     color: red;
@@ -13,7 +9,6 @@
     font-size: 12px;
     line-height: 14px;
     position: absolute;
-
 }
 
 .form__input-error:last-of-type {
