@@ -17,23 +17,17 @@ export const getInitialCards = () => {
     return fetch(`${config.baseUrl}/cards`, {
         headers: config.headers
     })
-    .then((res) => handleResponse(res))
-    .catch((err) => {
-        console.log('Ошибка инициализации карточек', err);
-    })
+    .then((res) => handleResponse(res));
 } 
 
 export const getProfileData = () => {
     return fetch(`${config.baseUrl}/users/me`, {
         headers: config.headers
     })
-    .then((res) => handleResponse(res))
-    .catch((err) => {
-        console.log('Ошибка получения данных профиля', err);
-    })
+    .then((res) => handleResponse(res));
 }
 
-  export const patchProfile = (nameInput, jobInput) => {
+export const patchProfile = (nameInput, jobInput) => {
     return fetch(`${config.baseUrl}/users/me`, {
         method: 'PATCH',
         headers: config.headers,
@@ -42,10 +36,7 @@ export const getProfileData = () => {
             about: jobInput
         })
     })
-    .then((res) => handleResponse(res))
-    .catch((err) => {
-        console.log('Ошибка изменения данных профиля', err);
-    })
+    .then((res) => handleResponse(res));
 }
 
 export const addNewCard = (cardName, cardUrl) => {
@@ -55,23 +46,17 @@ export const addNewCard = (cardName, cardUrl) => {
         body: JSON.stringify({
             name: cardName,
             link: cardUrl,
-            })
         })
-        .then((res) => handleResponse(res))
-        .catch((err) => {
-            console.log('Ошибка добавления новой карточки', err);
-        })
-    }
+    })
+    .then((res) => handleResponse(res));
+}
 
 export const deleteCardApi = (cardId) => {
     return fetch(`${config.baseUrl}/cards/${cardId}`, {
         method: 'DELETE',
         headers: config.headers,
     })
-    .then((res) => handleResponse(res))
-    .catch((err) => {
-        console.log('Ошибка удаления карточки', err);
-    })
+    .then((res) => handleResponse(res));
 }
 
 export const putCardLike = (id) => {
@@ -79,10 +64,7 @@ export const putCardLike = (id) => {
         method: 'PUT',
         headers: config.headers,
     })
-    .then((res)=> handleResponse(res))
-    .catch((err) => {
-        console.log('Ошибка добавления лайка', err);
-    })
+    .then((res)=> handleResponse(res));
 }
 
 export const deleteCardLike = (id) => {
@@ -90,10 +72,7 @@ export const deleteCardLike = (id) => {
         method: 'DELETE',
         headers: config.headers,
     })
-    .then((res)=> handleResponse(res))
-    .catch((err) => {
-        console.log('Ошибка удаления лайка', err);
-    })
+    .then((res)=> handleResponse(res));
 }
 
 export const changeAvatar = (avatar) => {
@@ -104,8 +83,5 @@ export const changeAvatar = (avatar) => {
         avatar: avatar,
       })
     })
-    .then((res) => handleResponse(res))
-    .catch((err) => {
-        console.log('Ошибка обновления аватара', err);
-    })
-  };
+    .then((res) => handleResponse(res));
+};

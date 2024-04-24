@@ -7,17 +7,18 @@ export function openModal(modal) {
 
 export function closeModal(modal) {
     modal.classList.remove('popup_is-opened');
+    modal.removeEventListener('click', closeModalByOverlay);
     document.removeEventListener('keydown', closeModalByEsc);
 };
 
 export function closeModalByOverlay(evt) {
     if (evt.currentTarget === evt.target) {
-    closeModal(evt.currentTarget);
+        closeModal(evt.currentTarget);
     }; 
 };
 
 function closeModalByEsc(evt) {
     if (evt.key == 'Escape') {
-    closeModal(document.querySelector('.popup_is-opened'));
+        closeModal(document.querySelector('.popup_is-opened'));
     };
 };

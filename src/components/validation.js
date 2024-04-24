@@ -10,21 +10,21 @@ export function isValid(formElement, inputElement, config) {
     } else {
         hideInputError(formElement, inputElement, config);
     };
-  }; 
+}; 
 
 export function showInputError(formElement, inputElement, errorMessage, config) {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
     inputElement.classList.add(config.inputErrorClass);
     errorElement.textContent = errorMessage;
     errorElement.classList.add(config.errorClass);
-  };
+};
   
-export function hideInputError(formElement, inputElement, config) {
+  export function hideInputError(formElement, inputElement, config) {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
     inputElement.classList.remove(config.inputErrorClass);
     errorElement.classList.remove(config.errorClass);
     errorElement.textContent = '';
-  };  
+};  
 
 export function hasInvalidInput(inputList) {
     return inputList.some((inputElement) => {
@@ -57,15 +57,15 @@ export function setEventListeners(formElement, config) {
 export function enableValidation(config) {
     const formList = Array.from(document.querySelectorAll(config.formSelector));
     formList.forEach((formElement) => {
-        setEventListeners(formElement, config);
-});
+       setEventListeners(formElement, config);
+    });
 };
 
 export function clearValidation(formElement, config) {
-    formElement.querySelectorAll(config.errorInactive).forEach(el =>
-        el.textContent = '');
-    formElement.querySelectorAll(config.inputSelector).forEach(el =>
-        el.classList.remove(config.inputErrorClass));
-    formElement.querySelector(config.submitButtonSelector).disabled = true;
-    formElement.querySelector(config.submitButtonSelector).classList.add(config.inactiveButtonClass);
+    const inputList = Array.from(formElement.querySelectorAll(config.inputSelector));
+    const buttonElement = formElement.querySelector(config.submitButtonSelector);
+    toggleButtonState(inputList, buttonElement, config.inactiveButtonClass);
+    inputList.forEach((inputElement) => {
+        hideInputError(formElement, inputElement, config);
+    });
 }
